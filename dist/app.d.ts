@@ -6,8 +6,9 @@ export * from './services/index';
 export declare const WEBSTORAGE_CONFIG: InjectionToken<{}>;
 export declare class Ng2Webstorage {
     private ngZone;
+    private _platformId;
     static forRoot(config?: IWebstorageConfig): ModuleWithProviders;
-    constructor(ngZone: NgZone, config: WebstorageConfig);
+    constructor(ngZone: NgZone, _platformId: string, config: WebstorageConfig);
     private initStorageListener();
 }
 export declare function provideConfig(config: IWebstorageConfig): WebstorageConfig;

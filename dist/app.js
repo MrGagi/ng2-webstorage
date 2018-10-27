@@ -1,17 +1,19 @@
-import { Inject, InjectionToken, NgModule, NgZone, Optional } from '@angular/core';
+import { Inject, InjectionToken, NgModule, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import { STORAGE } from './enums/storage';
 import { LocalStorageService, SessionStorageService } from './services/index';
 import { WebStorageHelper } from './helpers/webStorage';
 import { WebstorageConfig } from './interfaces/config';
 import { KeyStorageHelper } from './helpers/keyStorage';
 import { StorageObserverHelper } from './helpers/storageObserver';
+import { isPlatformBrowser } from '@angular/common';
 export * from './interfaces/index';
 export * from './decorators/index';
 export * from './services/index';
 export var WEBSTORAGE_CONFIG = new InjectionToken('WEBSTORAGE_CONFIG');
 var Ng2Webstorage = (function () {
-    function Ng2Webstorage(ngZone, config) {
+    function Ng2Webstorage(ngZone, _platformId, config) {
         this.ngZone = ngZone;
+        this._platformId = _platformId;
         if (config) {
             KeyStorageHelper.setStorageKeyPrefix(config.prefix);
             KeyStorageHelper.setStorageKeySeparator(config.separator);
@@ -40,7 +42,7 @@ var Ng2Webstorage = (function () {
     };
     Ng2Webstorage.prototype.initStorageListener = function () {
         var _this = this;
-        if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined' && isPlatformBrowser(this._platformId)) {
             window.addEventListener('storage', function (event) {
                 return _this.ngZone.run(function () {
                     var storage = window.sessionStorage === event.storageArea ? STORAGE.session : STORAGE.local;
@@ -62,6 +64,7 @@ var Ng2Webstorage = (function () {
     /** @nocollapse */
     Ng2Webstorage.ctorParameters = function () { return [
         { type: NgZone, },
+        { type: undefined, decorators: [{ type: Inject, args: [PLATFORM_ID,] },] },
         { type: WebstorageConfig, decorators: [{ type: Optional }, { type: Inject, args: [WebstorageConfig,] },] },
     ]; };
     return Ng2Webstorage;
